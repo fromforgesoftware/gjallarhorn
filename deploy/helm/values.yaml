@@ -48,11 +48,50 @@ database:
   name: ''
   schema: gjallarhorn
   ssl: require
+  # pgx query log level (debug|info|warn|error|none); warn keeps slow/failed only.
+  logLevel: warn
   # Credentials: reference an existing secret with keys DB_USER/DB_PASSWORD,
   # or set username/password to have the chart create one.
   existingSecret: ''
   username: ''
   password: ''
+
+# Delivery channels. The senders read these via envconfig (SMTP_*, SMS_*,
+# PUSH_*, WEBHOOK_SIGNING_SECRET). Non-secret values (hosts/URLs/from) live
+# here; secrets (passwords/auth headers/signing secret) live in a Secret —
+# either an existingSecret you supply, or one the chart creates from the
+# *secret* fields below. Leave channel config empty to disable that channel
+# (the sender returns "channel is not configured" when used).
+channels:
+  # Reference an existing secret with keys SMTP_PASSWORD, WEBHOOK_SIGNING_SECRET,
+  # SMS_AUTH_HEADER, PUSH_AUTH_HEADER. Empty = chart creates one from the
+  # *secret* values below.
+  existingSecret: ''
+
+  # EMAIL channel (SMTP).
+  email:
+    addr: '' # host:port, e.g. smtp.example.com:587
+    host: '' # SMTP server host used for auth, e.g. smtp.example.com
+    from: '' # envelope/From address, e.g. no-reply@example.com
+    username: ''
+  emailSecret:
+    password: '' # SMTP_PASSWORD
+
+  # WEBHOOK channel: HMAC-SHA256 signing secret for outgoing payloads.
+  webhookSecret:
+    signingSecret: '' # WEBHOOK_SIGNING_SECRET
+
+  # SMS channel: provider-agnostic HTTP gateway (Twilio, carrier relay, …).
+  sms:
+    endpointUrl: '' # SMS_ENDPOINT_URL
+  smsSecret:
+    authHeader: '' # SMS_AUTH_HEADER, full header value e.g. "Bearer …" or "Basic …"
+
+  # PUSH channel: provider-agnostic HTTP gateway (FCM HTTP v1, …).
+  push:
+    endpointUrl: '' # PUSH_ENDPOINT_URL
+  pushSecret:
+    authHeader: '' # PUSH_AUTH_HEADER, full header value e.g. "Bearer …"
 
 # Pre-install / pre-upgrade migration job (runs /app/migrator).
 migrationJob:

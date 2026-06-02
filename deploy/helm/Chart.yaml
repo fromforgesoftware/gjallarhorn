@@ -1,13 +1,15 @@
 apiVersion: v2
 name: gjallarhorn
-description: Gjallarhorn — forge audit / event-stream service
+description: Gjallarhorn — forge notification service (email, SMS, push, webhook)
 type: application
 version: 0.1.0
 appVersion: '0.1.0'
 keywords:
-  - audit
-  - events
-  - event-stream
+  - notifications
+  - email
+  - sms
+  - push
+  - webhook
   - forge
 maintainers:
   - name: Forge

@@ -1,15 +1,18 @@
 # Gjallarhorn builds two binaries (server + migrator) into one distroless image.
-# Build context is the forge repo root so the kit replace directive
-# (../../go/kit) resolves. See skaffold.yaml / `docker build -f`.
+# Standalone repo: the Go module lives at the repo root and go-kit is a
+# published dependency (no replace directive), so the build context is this
+# repo root. GOWORK=off ignores any ambient go.work.
 ARG GO_VERSION=1.25
 FROM golang:${GO_VERSION}-alpine AS builder
 WORKDIR /src
-
-# Only the module surface Gjallarhorn needs: the kit and the service itself.
-COPY services/gjallarhorn/ /src/services/gjallarhorn/
-
-WORKDIR /src/services/gjallarhorn
 ENV GOWORK=off
+
+# Resolve dependencies first for better layer caching.
+COPY go.mod go.sum ./
+RUN go mod download
+
+# Build the service from the module root.
+COPY . .
 RUN CGO_ENABLED=0 go build -trimpath -o /out/server   ./cmd/server
 RUN CGO_ENABLED=0 go build -trimpath -o /out/migrator ./cmd/migrator
 

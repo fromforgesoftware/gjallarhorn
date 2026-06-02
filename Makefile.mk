@@ -1,26 +1,26 @@
-HERALD_DIR ?= services/herald
+GJALLARHORN_DIR ?= .
 
-.PHONY: herald-proto herald-build herald-test herald-vet herald-lint herald-migrate herald-run
+.PHONY: gjallarhorn-proto gjallarhorn-build gjallarhorn-test gjallarhorn-vet gjallarhorn-lint gjallarhorn-migrate gjallarhorn-run
 
-herald-proto:          ## Regenerate Go code from the Herald protos
-	cd $(HERALD_DIR) && buf generate
+gjallarhorn-proto:          ## Regenerate Go code from the Gjallarhorn protos
+	cd $(GJALLARHORN_DIR) && buf generate
 
-herald-lint:           ## Lint the Herald protos
-	cd $(HERALD_DIR) && buf lint
+gjallarhorn-lint:           ## Lint the Gjallarhorn protos
+	cd $(GJALLARHORN_DIR) && buf lint
 
-herald-build:          ## Build all Herald packages
-	cd $(HERALD_DIR) && go build ./...
+gjallarhorn-build:          ## Build all Gjallarhorn packages
+	cd $(GJALLARHORN_DIR) && go build ./...
 
-herald-vet:            ## Vet the Herald module
-	cd $(HERALD_DIR) && go vet ./...
+gjallarhorn-vet:            ## Vet the Gjallarhorn module
+	cd $(GJALLARHORN_DIR) && go vet ./...
 
-herald-test:           ## Run Herald unit tests
-	cd $(HERALD_DIR) && go test ./...
+gjallarhorn-test:           ## Run Gjallarhorn unit tests
+	cd $(GJALLARHORN_DIR) && go test ./...
 
-HERALD_LOCAL_ENV := SVC_NAME=herald REST_ADDRESS=:8080 HTTP_ADDRESS=:8080 GRPC_ADDRESS=:9090
+GJALLARHORN_LOCAL_ENV := SVC_NAME=gjallarhorn REST_ADDRESS=:8080 HTTP_ADDRESS=:8080 GRPC_ADDRESS=:9090
 
-herald-migrate:        ## Apply Herald migrations (reads DB_* env)
-	cd $(HERALD_DIR) && go run ./cmd/migrator
+gjallarhorn-migrate:        ## Apply Gjallarhorn migrations (reads DB_* env)
+	cd $(GJALLARHORN_DIR) && go run ./cmd/migrator
 
-herald-run:            ## Run the Herald server locally
-	cd $(HERALD_DIR) && $(HERALD_LOCAL_ENV) go run ./cmd/server
+gjallarhorn-run:            ## Run the Gjallarhorn server locally
+	cd $(GJALLARHORN_DIR) && $(GJALLARHORN_LOCAL_ENV) go run ./cmd/server
