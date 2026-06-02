@@ -45,6 +45,12 @@ func NewSMTPSenderWithDialer(cfg SMTPConfig, dialer MailDialer) *SMTPSender {
 
 func (s *SMTPSender) Channel() string { return domain.ChannelEmail }
 
+// SuccessStatus reports StatusDelivered: net/smtp's SendMail returns nil only
+// after the receiving server has accepted the message (RCPT + DATA acknowledged),
+// so an error-free send is a confirmed handoff to the final mail server, not a
+// mere enqueue. Implements ConfirmingSender.
+func (s *SMTPSender) SuccessStatus() domain.NotificationStatus { return domain.StatusDelivered }
+
 func (s *SMTPSender) Send(_ context.Context, n domain.Notification) error {
 	var auth smtp.Auth
 	if s.cfg.Username != "" {

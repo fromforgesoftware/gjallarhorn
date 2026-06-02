@@ -19,8 +19,9 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	GjallarhornService_Send_FullMethodName            = "/gjallarhorn.v1.GjallarhornService/Send"
-	GjallarhornService_GetNotification_FullMethodName = "/gjallarhorn.v1.GjallarhornService/GetNotification"
+	GjallarhornService_Send_FullMethodName                 = "/gjallarhorn.v1.GjallarhornService/Send"
+	GjallarhornService_GetNotification_FullMethodName      = "/gjallarhorn.v1.GjallarhornService/GetNotification"
+	GjallarhornService_ListDeliveryAttempts_FullMethodName = "/gjallarhorn.v1.GjallarhornService/ListDeliveryAttempts"
 )
 
 // GjallarhornServiceClient is the client API for GjallarhornService service.
@@ -34,6 +35,9 @@ type GjallarhornServiceClient interface {
 	Send(ctx context.Context, in *SendRequest, opts ...grpc.CallOption) (*SendResponse, error)
 	// GetNotification returns a notification and its current delivery status.
 	GetNotification(ctx context.Context, in *GetNotificationRequest, opts ...grpc.CallOption) (*GetNotificationResponse, error)
+	// ListDeliveryAttempts returns the ordered delivery-attempt log for a
+	// notification, backing the console delivery board.
+	ListDeliveryAttempts(ctx context.Context, in *ListDeliveryAttemptsRequest, opts ...grpc.CallOption) (*ListDeliveryAttemptsResponse, error)
 }
 
 type gjallarhornServiceClient struct {
@@ -64,6 +68,16 @@ func (c *gjallarhornServiceClient) GetNotification(ctx context.Context, in *GetN
 	return out, nil
 }
 
+func (c *gjallarhornServiceClient) ListDeliveryAttempts(ctx context.Context, in *ListDeliveryAttemptsRequest, opts ...grpc.CallOption) (*ListDeliveryAttemptsResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ListDeliveryAttemptsResponse)
+	err := c.cc.Invoke(ctx, GjallarhornService_ListDeliveryAttempts_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // GjallarhornServiceServer is the server API for GjallarhornService service.
 // All implementations should embed UnimplementedGjallarhornServiceServer
 // for forward compatibility.
@@ -75,6 +89,9 @@ type GjallarhornServiceServer interface {
 	Send(context.Context, *SendRequest) (*SendResponse, error)
 	// GetNotification returns a notification and its current delivery status.
 	GetNotification(context.Context, *GetNotificationRequest) (*GetNotificationResponse, error)
+	// ListDeliveryAttempts returns the ordered delivery-attempt log for a
+	// notification, backing the console delivery board.
+	ListDeliveryAttempts(context.Context, *ListDeliveryAttemptsRequest) (*ListDeliveryAttemptsResponse, error)
 }
 
 // UnimplementedGjallarhornServiceServer should be embedded to have
@@ -89,6 +106,9 @@ func (UnimplementedGjallarhornServiceServer) Send(context.Context, *SendRequest)
 }
 func (UnimplementedGjallarhornServiceServer) GetNotification(context.Context, *GetNotificationRequest) (*GetNotificationResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetNotification not implemented")
+}
+func (UnimplementedGjallarhornServiceServer) ListDeliveryAttempts(context.Context, *ListDeliveryAttemptsRequest) (*ListDeliveryAttemptsResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method ListDeliveryAttempts not implemented")
 }
 func (UnimplementedGjallarhornServiceServer) testEmbeddedByValue() {}
 
@@ -146,6 +166,24 @@ func _GjallarhornService_GetNotification_Handler(srv interface{}, ctx context.Co
 	return interceptor(ctx, in, info, handler)
 }
 
+func _GjallarhornService_ListDeliveryAttempts_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListDeliveryAttemptsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GjallarhornServiceServer).ListDeliveryAttempts(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: GjallarhornService_ListDeliveryAttempts_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GjallarhornServiceServer).ListDeliveryAttempts(ctx, req.(*ListDeliveryAttemptsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // GjallarhornService_ServiceDesc is the grpc.ServiceDesc for GjallarhornService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -160,6 +198,10 @@ var GjallarhornService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetNotification",
 			Handler:    _GjallarhornService_GetNotification_Handler,
+		},
+		{
+			MethodName: "ListDeliveryAttempts",
+			Handler:    _GjallarhornService_ListDeliveryAttempts_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

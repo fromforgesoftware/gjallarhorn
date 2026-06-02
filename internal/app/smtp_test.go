@@ -53,3 +53,13 @@ func TestSMTPSender_PropagatesError(t *testing.T) {
 	sender := app.NewSMTPSenderWithDialer(app.SMTPConfig{Addr: "smtp:25"}, dialer)
 	require.Error(t, sender.Send(context.Background(), internaltest.NewNotification()))
 }
+
+// TestSMTPSender_ConfirmsDelivery pins that an SMTP send, which returns nil only
+// after the receiving server accepts the message, reports a confirmed
+// StatusDelivered via the ConfirmingSender capability.
+func TestSMTPSender_ConfirmsDelivery(t *testing.T) {
+	sender := app.NewSMTPSenderWithDialer(app.SMTPConfig{Addr: "smtp:25"}, &fakeDialer{})
+	confirming, ok := any(sender).(app.ConfirmingSender)
+	require.True(t, ok, "SMTPSender must implement ConfirmingSender")
+	assert.Equal(t, domain.StatusDelivered, confirming.SuccessStatus())
+}

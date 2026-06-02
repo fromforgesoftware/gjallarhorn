@@ -12,6 +12,9 @@ service GjallarhornService {
   rpc Send(SendRequest) returns (SendResponse);
   // GetNotification returns a notification and its current delivery status.
   rpc GetNotification(GetNotificationRequest) returns (GetNotificationResponse);
+  // ListDeliveryAttempts returns the ordered delivery-attempt log for a
+  // notification, backing the console delivery board.
+  rpc ListDeliveryAttempts(ListDeliveryAttemptsRequest) returns (ListDeliveryAttemptsResponse);
 }
 
 // Notification is one message addressed to a recipient over a channel.
@@ -77,4 +80,34 @@ message GetNotificationRequest {
 message GetNotificationResponse {
   // notification is the requested notification with its delivery status.
   Notification notification = 1;
+}
+
+// DeliveryAttempt is one recorded send attempt for a notification.
+message DeliveryAttempt {
+  // id is the server-assigned UUID of the attempt.
+  string id = 1;
+  // notification_id is the notification this attempt belongs to.
+  string notification_id = 2;
+  // attempt is the 1-based attempt number.
+  int32 attempt = 3;
+  // status is the outcome of this attempt (e.g. DELIVERED, SENT, FAILED).
+  string status = 4;
+  // error holds the failure detail when the attempt did not succeed.
+  string error = 5;
+  // attempted_at is when the attempt was made.
+  google.protobuf.Timestamp attempted_at = 6;
+  // created_at is when the attempt record was written.
+  google.protobuf.Timestamp created_at = 7;
+}
+
+// ListDeliveryAttemptsRequest selects a notification's attempt log.
+message ListDeliveryAttemptsRequest {
+  // notification_id is the UUID of the notification whose attempts to list.
+  string notification_id = 1;
+}
+
+// ListDeliveryAttemptsResponse carries the ordered attempt log.
+message ListDeliveryAttemptsResponse {
+  // attempts is the notification's delivery attempts, oldest first.
+  repeated DeliveryAttempt attempts = 1;
 }

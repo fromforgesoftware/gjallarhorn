@@ -18,6 +18,26 @@ const (
 
 type NotificationStatus string
 
+// Notification lifecycle states.
+//
+//   - SCHEDULED  — persisted for a future send; the dispatcher claims it when due.
+//   - QUEUED     — accepted, awaiting its first send attempt.
+//   - SENT       — handed to an upstream gateway that delivers asynchronously
+//     (HTTP relay 2xx for SMS/PUSH/WEBHOOK); final delivery unconfirmed.
+//   - DELIVERED  — confirmed accepted by the final delivery server on a
+//     synchronous send (SMTP SendMail returns nil only after the receiving MX
+//     accepts). Set by the send path when the channel implements
+//     app.ConfirmingSender; see internal/app/channel.go.
+//   - BOUNCED    — the provider asynchronously reported the message undeliverable
+//     after acceptance (hard bounce / rejected delivery). This is inherently
+//     provider-dependent: it arrives out-of-band via a provider delivery-status
+//     webhook or polling, which this service does not yet ingest. The value is
+//     reserved as the documented extension point — when an inbound
+//     delivery-status receiver is added it transitions DELIVERED/SENT → BOUNCED
+//     via NotificationRepository.UpdateStatus, the same seam the send path uses.
+//     It is NOT produced today; see designDecisions.
+//   - FAILED     — every synchronous send attempt errored (after retries).
+//   - SUPPRESSED — recipient opted out of the channel; never dispatched.
 const (
 	StatusScheduled  NotificationStatus = "SCHEDULED"
 	StatusQueued     NotificationStatus = "QUEUED"

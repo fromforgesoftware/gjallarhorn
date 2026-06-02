@@ -56,6 +56,34 @@ func TestSend_DeliversAndMarksSent(t *testing.T) {
 	assert.Equal(t, domain.StatusSent, got.Status())
 }
 
+// confirmingSender is a ChannelSender that also implements ConfirmingSender,
+// declaring a successful send as a confirmed StatusDelivered (SMTP semantics).
+type confirmingSender struct {
+	channel string
+	err     error
+}
+
+func (s confirmingSender) Channel() string                                 { return s.channel }
+func (s confirmingSender) Send(context.Context, domain.Notification) error { return s.err }
+func (s confirmingSender) SuccessStatus() domain.NotificationStatus        { return domain.StatusDelivered }
+
+func TestSend_ConfirmingSenderMarksDelivered(t *testing.T) {
+	uc, notifications, attempts := newUsecase(t, confirmingSender{channel: domain.ChannelEmail})
+
+	stored := internaltest.NewNotification(internaltest.WithNID("n-d"))
+	notifications.EXPECT().Create(mock.Anything, mock.Anything).Return(stored, nil)
+	attempts.EXPECT().Create(mock.Anything, mock.MatchedBy(func(a domain.DeliveryAttempt) bool {
+		return a.NotificationID() == "n-d" && a.Attempt() == 1 && a.Status() == domain.StatusDelivered
+	})).Return(nil, nil)
+	notifications.EXPECT().UpdateStatus(mock.Anything, "n-d", domain.StatusDelivered, "").Return(nil)
+	notifications.EXPECT().Get(mock.Anything, mock.Anything).
+		Return(internaltest.NewNotification(internaltest.WithNID("n-d"), internaltest.WithNStatus(domain.StatusDelivered)), nil)
+
+	got, err := uc.Send(context.Background(), internaltest.NewNotification())
+	require.NoError(t, err)
+	assert.Equal(t, domain.StatusDelivered, got.Status())
+}
+
 func TestSend_RetriesThenFails(t *testing.T) {
 	sender := apptest.NewChannelSender(t)
 	sender.EXPECT().Channel().Return(domain.ChannelEmail)

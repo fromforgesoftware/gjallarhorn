@@ -261,6 +261,10 @@ func (uc *notificationUsecase) dispatch(ctx context.Context, created domain.Noti
 	if err != nil {
 		return nil, err
 	}
+	// success is the terminal status a confirmed (error-free) send records:
+	// StatusDelivered for transports that confirm final delivery (SMTP),
+	// StatusSent for fire-and-forget gateways. See ConfirmingSender.
+	success := successStatus(sender)
 	var lastErr error
 	for attempt := 1; attempt <= uc.backoff.MaxAttempts; attempt++ {
 		if attempt > 1 {
@@ -270,9 +274,9 @@ func (uc *notificationUsecase) dispatch(ctx context.Context, created domain.Noti
 			}
 		}
 		sendErr := sender.Send(ctx, created)
-		uc.recordAttempt(ctx, created.ID(), attempt, sendErr)
+		uc.recordAttempt(ctx, created.ID(), attempt, success, sendErr)
 		if sendErr == nil {
-			if err := uc.notifications.UpdateStatus(ctx, created.ID(), domain.StatusSent, ""); err != nil {
+			if err := uc.notifications.UpdateStatus(ctx, created.ID(), success, ""); err != nil {
 				return nil, err
 			}
 			return uc.reload(ctx, created.ID())
@@ -300,8 +304,11 @@ func validateSendable(n domain.Notification) error {
 	return nil
 }
 
-func (uc *notificationUsecase) recordAttempt(ctx context.Context, id string, attempt int, sendErr error) {
-	status := domain.StatusSent
+// recordAttempt logs one delivery attempt. A successful send records the
+// sender's confirmed-success status (success: StatusDelivered or StatusSent);
+// a failure records StatusFailed with the error message.
+func (uc *notificationUsecase) recordAttempt(ctx context.Context, id string, attempt int, success domain.NotificationStatus, sendErr error) {
+	status := success
 	errMsg := ""
 	if sendErr != nil {
 		status = domain.StatusFailed

@@ -10,6 +10,7 @@ packages:
     interfaces:
       NotificationRepository:
       DeliveryAttemptRepository:
+      DeliveryAttemptUsecase:
       NotificationUsecase:
       ChannelSender:
       NotificationTemplateRepository:

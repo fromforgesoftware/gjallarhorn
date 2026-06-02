@@ -407,6 +407,198 @@ func (x *GetNotificationResponse) GetNotification() *Notification {
 	return nil
 }
 
+// DeliveryAttempt is one recorded send attempt for a notification.
+type DeliveryAttempt struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// id is the server-assigned UUID of the attempt.
+	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	// notification_id is the notification this attempt belongs to.
+	NotificationId string `protobuf:"bytes,2,opt,name=notification_id,json=notificationId,proto3" json:"notification_id,omitempty"`
+	// attempt is the 1-based attempt number.
+	Attempt int32 `protobuf:"varint,3,opt,name=attempt,proto3" json:"attempt,omitempty"`
+	// status is the outcome of this attempt (e.g. DELIVERED, SENT, FAILED).
+	Status string `protobuf:"bytes,4,opt,name=status,proto3" json:"status,omitempty"`
+	// error holds the failure detail when the attempt did not succeed.
+	Error string `protobuf:"bytes,5,opt,name=error,proto3" json:"error,omitempty"`
+	// attempted_at is when the attempt was made.
+	AttemptedAt *timestamppb.Timestamp `protobuf:"bytes,6,opt,name=attempted_at,json=attemptedAt,proto3" json:"attempted_at,omitempty"`
+	// created_at is when the attempt record was written.
+	CreatedAt     *timestamppb.Timestamp `protobuf:"bytes,7,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DeliveryAttempt) Reset() {
+	*x = DeliveryAttempt{}
+	mi := &file_gjallarhorn_v1_gjallarhorn_proto_msgTypes[5]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DeliveryAttempt) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeliveryAttempt) ProtoMessage() {}
+
+func (x *DeliveryAttempt) ProtoReflect() protoreflect.Message {
+	mi := &file_gjallarhorn_v1_gjallarhorn_proto_msgTypes[5]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DeliveryAttempt.ProtoReflect.Descriptor instead.
+func (*DeliveryAttempt) Descriptor() ([]byte, []int) {
+	return file_gjallarhorn_v1_gjallarhorn_proto_rawDescGZIP(), []int{5}
+}
+
+func (x *DeliveryAttempt) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *DeliveryAttempt) GetNotificationId() string {
+	if x != nil {
+		return x.NotificationId
+	}
+	return ""
+}
+
+func (x *DeliveryAttempt) GetAttempt() int32 {
+	if x != nil {
+		return x.Attempt
+	}
+	return 0
+}
+
+func (x *DeliveryAttempt) GetStatus() string {
+	if x != nil {
+		return x.Status
+	}
+	return ""
+}
+
+func (x *DeliveryAttempt) GetError() string {
+	if x != nil {
+		return x.Error
+	}
+	return ""
+}
+
+func (x *DeliveryAttempt) GetAttemptedAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.AttemptedAt
+	}
+	return nil
+}
+
+func (x *DeliveryAttempt) GetCreatedAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.CreatedAt
+	}
+	return nil
+}
+
+// ListDeliveryAttemptsRequest selects a notification's attempt log.
+type ListDeliveryAttemptsRequest struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// notification_id is the UUID of the notification whose attempts to list.
+	NotificationId string `protobuf:"bytes,1,opt,name=notification_id,json=notificationId,proto3" json:"notification_id,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
+}
+
+func (x *ListDeliveryAttemptsRequest) Reset() {
+	*x = ListDeliveryAttemptsRequest{}
+	mi := &file_gjallarhorn_v1_gjallarhorn_proto_msgTypes[6]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListDeliveryAttemptsRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListDeliveryAttemptsRequest) ProtoMessage() {}
+
+func (x *ListDeliveryAttemptsRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_gjallarhorn_v1_gjallarhorn_proto_msgTypes[6]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListDeliveryAttemptsRequest.ProtoReflect.Descriptor instead.
+func (*ListDeliveryAttemptsRequest) Descriptor() ([]byte, []int) {
+	return file_gjallarhorn_v1_gjallarhorn_proto_rawDescGZIP(), []int{6}
+}
+
+func (x *ListDeliveryAttemptsRequest) GetNotificationId() string {
+	if x != nil {
+		return x.NotificationId
+	}
+	return ""
+}
+
+// ListDeliveryAttemptsResponse carries the ordered attempt log.
+type ListDeliveryAttemptsResponse struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// attempts is the notification's delivery attempts, oldest first.
+	Attempts      []*DeliveryAttempt `protobuf:"bytes,1,rep,name=attempts,proto3" json:"attempts,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListDeliveryAttemptsResponse) Reset() {
+	*x = ListDeliveryAttemptsResponse{}
+	mi := &file_gjallarhorn_v1_gjallarhorn_proto_msgTypes[7]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListDeliveryAttemptsResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListDeliveryAttemptsResponse) ProtoMessage() {}
+
+func (x *ListDeliveryAttemptsResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_gjallarhorn_v1_gjallarhorn_proto_msgTypes[7]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListDeliveryAttemptsResponse.ProtoReflect.Descriptor instead.
+func (*ListDeliveryAttemptsResponse) Descriptor() ([]byte, []int) {
+	return file_gjallarhorn_v1_gjallarhorn_proto_rawDescGZIP(), []int{7}
+}
+
+func (x *ListDeliveryAttemptsResponse) GetAttempts() []*DeliveryAttempt {
+	if x != nil {
+		return x.Attempts
+	}
+	return nil
+}
+
 var File_gjallarhorn_v1_gjallarhorn_proto protoreflect.FileDescriptor
 
 const file_gjallarhorn_v1_gjallarhorn_proto_rawDesc = "" +
@@ -442,10 +634,24 @@ const file_gjallarhorn_v1_gjallarhorn_proto_rawDesc = "" +
 	"\x16GetNotificationRequest\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\"[\n" +
 	"\x17GetNotificationResponse\x12@\n" +
-	"\fnotification\x18\x01 \x01(\v2\x1c.gjallarhorn.v1.NotificationR\fnotification2\xbb\x01\n" +
+	"\fnotification\x18\x01 \x01(\v2\x1c.gjallarhorn.v1.NotificationR\fnotification\"\x8c\x02\n" +
+	"\x0fDeliveryAttempt\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12'\n" +
+	"\x0fnotification_id\x18\x02 \x01(\tR\x0enotificationId\x12\x18\n" +
+	"\aattempt\x18\x03 \x01(\x05R\aattempt\x12\x16\n" +
+	"\x06status\x18\x04 \x01(\tR\x06status\x12\x14\n" +
+	"\x05error\x18\x05 \x01(\tR\x05error\x12=\n" +
+	"\fattempted_at\x18\x06 \x01(\v2\x1a.google.protobuf.TimestampR\vattemptedAt\x129\n" +
+	"\n" +
+	"created_at\x18\a \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\"F\n" +
+	"\x1bListDeliveryAttemptsRequest\x12'\n" +
+	"\x0fnotification_id\x18\x01 \x01(\tR\x0enotificationId\"[\n" +
+	"\x1cListDeliveryAttemptsResponse\x12;\n" +
+	"\battempts\x18\x01 \x03(\v2\x1f.gjallarhorn.v1.DeliveryAttemptR\battempts2\xae\x02\n" +
 	"\x12GjallarhornService\x12A\n" +
 	"\x04Send\x12\x1b.gjallarhorn.v1.SendRequest\x1a\x1c.gjallarhorn.v1.SendResponse\x12b\n" +
-	"\x0fGetNotification\x12&.gjallarhorn.v1.GetNotificationRequest\x1a'.gjallarhorn.v1.GetNotificationResponseB\xce\x01\n" +
+	"\x0fGetNotification\x12&.gjallarhorn.v1.GetNotificationRequest\x1a'.gjallarhorn.v1.GetNotificationResponse\x12q\n" +
+	"\x14ListDeliveryAttempts\x12+.gjallarhorn.v1.ListDeliveryAttemptsRequest\x1a,.gjallarhorn.v1.ListDeliveryAttemptsResponseB\xce\x01\n" +
 	"\x12com.gjallarhorn.v1B\x10GjallarhornProtoP\x01ZMgithub.com/fromforgesoftware/gjallarhorn/pkg/api/gjallarhorn/v1;gjallarhornv1\xa2\x02\x03GXX\xaa\x02\x0eGjallarhorn.V1\xca\x02\x0eGjallarhorn\\V1\xe2\x02\x1aGjallarhorn\\V1\\GPBMetadata\xea\x02\x0fGjallarhorn::V1b\x06proto3"
 
 var (
@@ -460,32 +666,40 @@ func file_gjallarhorn_v1_gjallarhorn_proto_rawDescGZIP() []byte {
 	return file_gjallarhorn_v1_gjallarhorn_proto_rawDescData
 }
 
-var file_gjallarhorn_v1_gjallarhorn_proto_msgTypes = make([]protoimpl.MessageInfo, 5)
+var file_gjallarhorn_v1_gjallarhorn_proto_msgTypes = make([]protoimpl.MessageInfo, 8)
 var file_gjallarhorn_v1_gjallarhorn_proto_goTypes = []any{
-	(*Notification)(nil),            // 0: gjallarhorn.v1.Notification
-	(*SendRequest)(nil),             // 1: gjallarhorn.v1.SendRequest
-	(*SendResponse)(nil),            // 2: gjallarhorn.v1.SendResponse
-	(*GetNotificationRequest)(nil),  // 3: gjallarhorn.v1.GetNotificationRequest
-	(*GetNotificationResponse)(nil), // 4: gjallarhorn.v1.GetNotificationResponse
-	(*structpb.Struct)(nil),         // 5: google.protobuf.Struct
-	(*timestamppb.Timestamp)(nil),   // 6: google.protobuf.Timestamp
+	(*Notification)(nil),                 // 0: gjallarhorn.v1.Notification
+	(*SendRequest)(nil),                  // 1: gjallarhorn.v1.SendRequest
+	(*SendResponse)(nil),                 // 2: gjallarhorn.v1.SendResponse
+	(*GetNotificationRequest)(nil),       // 3: gjallarhorn.v1.GetNotificationRequest
+	(*GetNotificationResponse)(nil),      // 4: gjallarhorn.v1.GetNotificationResponse
+	(*DeliveryAttempt)(nil),              // 5: gjallarhorn.v1.DeliveryAttempt
+	(*ListDeliveryAttemptsRequest)(nil),  // 6: gjallarhorn.v1.ListDeliveryAttemptsRequest
+	(*ListDeliveryAttemptsResponse)(nil), // 7: gjallarhorn.v1.ListDeliveryAttemptsResponse
+	(*structpb.Struct)(nil),              // 8: google.protobuf.Struct
+	(*timestamppb.Timestamp)(nil),        // 9: google.protobuf.Timestamp
 }
 var file_gjallarhorn_v1_gjallarhorn_proto_depIdxs = []int32{
-	5, // 0: gjallarhorn.v1.Notification.data:type_name -> google.protobuf.Struct
-	6, // 1: gjallarhorn.v1.Notification.created_at:type_name -> google.protobuf.Timestamp
-	6, // 2: gjallarhorn.v1.Notification.updated_at:type_name -> google.protobuf.Timestamp
-	5, // 3: gjallarhorn.v1.SendRequest.data:type_name -> google.protobuf.Struct
-	0, // 4: gjallarhorn.v1.SendResponse.notification:type_name -> gjallarhorn.v1.Notification
-	0, // 5: gjallarhorn.v1.GetNotificationResponse.notification:type_name -> gjallarhorn.v1.Notification
-	1, // 6: gjallarhorn.v1.GjallarhornService.Send:input_type -> gjallarhorn.v1.SendRequest
-	3, // 7: gjallarhorn.v1.GjallarhornService.GetNotification:input_type -> gjallarhorn.v1.GetNotificationRequest
-	2, // 8: gjallarhorn.v1.GjallarhornService.Send:output_type -> gjallarhorn.v1.SendResponse
-	4, // 9: gjallarhorn.v1.GjallarhornService.GetNotification:output_type -> gjallarhorn.v1.GetNotificationResponse
-	8, // [8:10] is the sub-list for method output_type
-	6, // [6:8] is the sub-list for method input_type
-	6, // [6:6] is the sub-list for extension type_name
-	6, // [6:6] is the sub-list for extension extendee
-	0, // [0:6] is the sub-list for field type_name
+	8,  // 0: gjallarhorn.v1.Notification.data:type_name -> google.protobuf.Struct
+	9,  // 1: gjallarhorn.v1.Notification.created_at:type_name -> google.protobuf.Timestamp
+	9,  // 2: gjallarhorn.v1.Notification.updated_at:type_name -> google.protobuf.Timestamp
+	8,  // 3: gjallarhorn.v1.SendRequest.data:type_name -> google.protobuf.Struct
+	0,  // 4: gjallarhorn.v1.SendResponse.notification:type_name -> gjallarhorn.v1.Notification
+	0,  // 5: gjallarhorn.v1.GetNotificationResponse.notification:type_name -> gjallarhorn.v1.Notification
+	9,  // 6: gjallarhorn.v1.DeliveryAttempt.attempted_at:type_name -> google.protobuf.Timestamp
+	9,  // 7: gjallarhorn.v1.DeliveryAttempt.created_at:type_name -> google.protobuf.Timestamp
+	5,  // 8: gjallarhorn.v1.ListDeliveryAttemptsResponse.attempts:type_name -> gjallarhorn.v1.DeliveryAttempt
+	1,  // 9: gjallarhorn.v1.GjallarhornService.Send:input_type -> gjallarhorn.v1.SendRequest
+	3,  // 10: gjallarhorn.v1.GjallarhornService.GetNotification:input_type -> gjallarhorn.v1.GetNotificationRequest
+	6,  // 11: gjallarhorn.v1.GjallarhornService.ListDeliveryAttempts:input_type -> gjallarhorn.v1.ListDeliveryAttemptsRequest
+	2,  // 12: gjallarhorn.v1.GjallarhornService.Send:output_type -> gjallarhorn.v1.SendResponse
+	4,  // 13: gjallarhorn.v1.GjallarhornService.GetNotification:output_type -> gjallarhorn.v1.GetNotificationResponse
+	7,  // 14: gjallarhorn.v1.GjallarhornService.ListDeliveryAttempts:output_type -> gjallarhorn.v1.ListDeliveryAttemptsResponse
+	12, // [12:15] is the sub-list for method output_type
+	9,  // [9:12] is the sub-list for method input_type
+	9,  // [9:9] is the sub-list for extension type_name
+	9,  // [9:9] is the sub-list for extension extendee
+	0,  // [0:9] is the sub-list for field type_name
 }
 
 func init() { file_gjallarhorn_v1_gjallarhorn_proto_init() }
@@ -499,7 +713,7 @@ func file_gjallarhorn_v1_gjallarhorn_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_gjallarhorn_v1_gjallarhorn_proto_rawDesc), len(file_gjallarhorn_v1_gjallarhorn_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   5,
+			NumMessages:   8,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

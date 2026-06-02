@@ -20,10 +20,11 @@ import (
 
 type gjallarhornController struct {
 	notifications app.NotificationUsecase
+	attempts      app.DeliveryAttemptUsecase
 }
 
-func NewGjallarhornController(notifications app.NotificationUsecase) kitgrpc.Controller {
-	return &gjallarhornController{notifications: notifications}
+func NewGjallarhornController(notifications app.NotificationUsecase, attempts app.DeliveryAttemptUsecase) kitgrpc.Controller {
+	return &gjallarhornController{notifications: notifications, attempts: attempts}
 }
 
 func (c *gjallarhornController) SD() kitgrpc.ServiceDesc {
@@ -51,6 +52,32 @@ func (c *gjallarhornController) GetNotification(ctx context.Context, req *gjalla
 		return nil, err
 	}
 	return &gjallarhornv1.GetNotificationResponse{Notification: notificationToProto(n)}, nil
+}
+
+func (c *gjallarhornController) ListDeliveryAttempts(ctx context.Context, req *gjallarhornv1.ListDeliveryAttemptsRequest) (*gjallarhornv1.ListDeliveryAttemptsResponse, error) {
+	res, err := c.attempts.List(ctx, search.WithQueryOpts(
+		query.FilterBy(filter.OpEq, fields.NotificationID, req.GetNotificationId()),
+	))
+	if err != nil {
+		return nil, err
+	}
+	attempts := make([]*gjallarhornv1.DeliveryAttempt, 0, len(res.Results()))
+	for _, a := range res.Results() {
+		attempts = append(attempts, deliveryAttemptToProto(a))
+	}
+	return &gjallarhornv1.ListDeliveryAttemptsResponse{Attempts: attempts}, nil
+}
+
+func deliveryAttemptToProto(a domain.DeliveryAttempt) *gjallarhornv1.DeliveryAttempt {
+	return &gjallarhornv1.DeliveryAttempt{
+		Id:             a.ID(),
+		NotificationId: a.NotificationID(),
+		Attempt:        int32(a.Attempt()),
+		Status:         a.Status().String(),
+		Error:          a.Error(),
+		AttemptedAt:    timestamppb.New(a.AttemptedAt()),
+		CreatedAt:      timestamppb.New(a.CreatedAt()),
+	}
 }
 
 func notificationToProto(n domain.Notification) *gjallarhornv1.Notification {

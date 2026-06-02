@@ -116,6 +116,7 @@ func usecasesFxModule() fx.Option {
 		fx.Provide(
 			fx.Annotate(app.NewTemplateUsecase, fx.As(new(app.TemplateUsecase))),
 			fx.Annotate(app.NewPreferenceUsecase, fx.As(new(app.PreferenceUsecase))),
+			fx.Annotate(app.NewDeliveryAttemptUsecase, fx.As(new(app.DeliveryAttemptUsecase))),
 			newNotificationUsecase,
 		),
 	)
@@ -129,6 +130,7 @@ func transportFxModule() fx.Option {
 		kitrest.NewFxController(gjallarhornhttp.NewNotificationController),
 		kitrest.NewFxController(gjallarhornhttp.NewNotificationTemplateController),
 		kitrest.NewFxController(gjallarhornhttp.NewNotificationPreferenceController),
+		kitrest.NewFxController(gjallarhornhttp.NewDeliveryAttemptController),
 	)
 }
 
