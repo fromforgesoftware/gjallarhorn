@@ -8,19 +8,59 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-        with:
-          path: gjallarhorn
-      - uses: actions/checkout@v4
-        with:
-          repository: fromforgesoftware/go-kit
-          path: go-kit
       - uses: actions/setup-go@v5
         with:
-          go-version-file: gjallarhorn/go.mod
-      - name: build + vet + test (go-kit via workspace)
+          go-version-file: go.mod
+      # Build/test against the PINNED, published go-kit module (v0.1.0 from the
+      # proxy) — the same dependency that ships in go.mod — instead of a sibling
+      # checkout of go-kit@main via `go work`. This makes CI exercise the
+      # actually-released dependency and eliminates version skew.
+      - name: build + vet + test
         run: |
-          cd gjallarhorn
-          go work init . ../go-kit
           go build ./...
           go vet ./...
           go test ./...
+
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v6
+        with:
+          version: v2.1.1
+
+  buf:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - uses: bufbuild/buf-action@v1
+        with:
+          setup_only: true
+      # Regenerate protobuf/grpc stubs and fail if the committed code is stale.
+      - name: buf generate + verify no drift
+        run: |
+          buf generate
+          git diff --exit-status
+
+  integration:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      # The `//go:build integration` DB suites use go-kit's gormdbtest helper,
+      # which provisions its OWN Postgres via gnomock by talking directly to the
+      # Docker daemon (it does not read an external DSN/service container). The
+      # helper sets DB_HOST/DB_PORT/DB_USER/DB_PASSWORD/DB_NAME/DB_SSL/DB_SCHEMA
+      # from the container it starts, so all that CI needs is a working Docker
+      # daemon — which GitHub-hosted ubuntu runners provide out of the box.
+      - name: integration tests
+        run: go test -tags=integration ./...
