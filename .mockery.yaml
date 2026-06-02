@@ -1,0 +1,19 @@
+disable-version-string: true
+with-expecter: true
+filename: '{{.InterfaceName | snakecase}}_mock.go'
+mockname: '{{.InterfaceName}}'
+outpkg: 'apptest'
+dir: 'internal/app/apptest'
+all: false
+packages:
+  github.com/fromforgesoftware/gjallarhorn/internal/app:
+    interfaces:
+      NotificationRepository:
+      DeliveryAttemptRepository:
+      NotificationUsecase:
+      ChannelSender:
+      NotificationTemplateRepository:
+      TemplateUsecase:
+      TemplateRenderer:
+      NotificationPreferenceRepository:
+      PreferenceUsecase:

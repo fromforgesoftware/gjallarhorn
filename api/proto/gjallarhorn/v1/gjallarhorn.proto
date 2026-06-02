@@ -1,0 +1,80 @@
+syntax = "proto3";
+
+package gjallarhorn.v1;
+
+import "google/protobuf/struct.proto";
+import "google/protobuf/timestamp.proto";
+
+// GjallarhornService delivers notifications over one or more channels and exposes
+// the delivery status of a previously sent notification.
+service GjallarhornService {
+  // Send queues and dispatches a notification, returning its final state.
+  rpc Send(SendRequest) returns (SendResponse);
+  // GetNotification returns a notification and its current delivery status.
+  rpc GetNotification(GetNotificationRequest) returns (GetNotificationResponse);
+}
+
+// Notification is one message addressed to a recipient over a channel.
+message Notification {
+  // id is the server-assigned UUID of the notification.
+  string id = 1;
+  // realm_id is the optional tenant the notification belongs to.
+  string realm_id = 2;
+  // recipient is the channel-specific address (e.g. an email address).
+  string recipient = 3;
+  // channel selects the delivery transport (e.g. EMAIL).
+  string channel = 4;
+  // template names an optional message template (rendered in a later wave).
+  string template = 5;
+  // data carries structured values for template rendering.
+  google.protobuf.Struct data = 6;
+  // subject is the rendered message subject.
+  string subject = 7;
+  // body is the rendered message body.
+  string body = 8;
+  // status is the delivery lifecycle state.
+  string status = 9;
+  // last_error holds the most recent delivery error, if any.
+  string last_error = 10;
+  // created_at is when the notification was queued.
+  google.protobuf.Timestamp created_at = 11;
+  // updated_at is when the notification last changed state.
+  google.protobuf.Timestamp updated_at = 12;
+}
+
+// SendRequest carries the notification to deliver. id and status are
+// server-assigned.
+message SendRequest {
+  // realm_id is the optional tenant the notification belongs to.
+  string realm_id = 1;
+  // recipient is the channel-specific address (required).
+  string recipient = 2;
+  // channel selects the delivery transport (required).
+  string channel = 3;
+  // template names an optional message template.
+  string template = 4;
+  // data carries structured values for template rendering.
+  google.protobuf.Struct data = 5;
+  // subject is the message subject.
+  string subject = 6;
+  // body is the message body.
+  string body = 7;
+}
+
+// SendResponse returns the notification after a delivery attempt.
+message SendResponse {
+  // notification is the persisted notification with its delivery status.
+  Notification notification = 1;
+}
+
+// GetNotificationRequest selects a notification by id.
+message GetNotificationRequest {
+  // id is the UUID of the notification to fetch.
+  string id = 1;
+}
+
+// GetNotificationResponse carries the requested notification.
+message GetNotificationResponse {
+  // notification is the requested notification with its delivery status.
+  Notification notification = 1;
+}

@@ -1,0 +1,15 @@
+replicaCount: 2
+
+database:
+  host: '' # set by the deploy pipeline / env overlay
+  name: gjallarhorn
+  schema: gjallarhorn
+  ssl: require
+  existingSecret: gjallarhorn-db
+
+autoscaling:
+  enabled: false
+
+podDisruptionBudget:
+  enabled: true
+  minAvailable: 1
