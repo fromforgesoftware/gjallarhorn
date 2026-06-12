@@ -3,7 +3,8 @@
 # published dependency (no replace directive), so the build context is this
 # repo root. GOWORK=off ignores any ambient go.work.
 ARG GO_VERSION=1.25
-FROM golang:${GO_VERSION}-alpine AS builder
+FROM --platform=$BUILDPLATFORM golang:${GO_VERSION}-alpine AS builder
+ARG TARGETOS TARGETARCH
 WORKDIR /src
 ENV GOWORK=off
 
@@ -13,8 +14,8 @@ RUN go mod download
 
 # Build the service from the module root.
 COPY . .
-RUN CGO_ENABLED=0 go build -trimpath -o /out/server   ./cmd/server
-RUN CGO_ENABLED=0 go build -trimpath -o /out/migrator ./cmd/migrator
+RUN CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH go build -trimpath -o /out/server   ./cmd/server
+RUN CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH go build -trimpath -o /out/migrator ./cmd/migrator
 
 FROM gcr.io/distroless/static-debian12:nonroot
 COPY --from=builder /out/server   /app/server
